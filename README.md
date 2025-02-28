@@ -20,6 +20,7 @@ docker ps
 ### request
 ```
 grpcurl -plaintext -d '{"name": "kenta"}' localhost:8080 hello.Greeter/SayHello
+grpcurl -plaintext -d '{"name": "kenta", "email":"sample@net.com"}' localhost:8080 user.User/CreateUser
 ```
 
 
