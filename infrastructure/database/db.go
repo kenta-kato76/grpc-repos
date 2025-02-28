@@ -1,17 +1,19 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
 
 type MySQLDB struct {
-	Conn *sql.DB
+	DB *gorm.DB
 }
 
 func NewMySQLDB() (*MySQLDB, error) {
@@ -21,22 +23,43 @@ func NewMySQLDB() (*MySQLDB, error) {
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname)
-	db, err := sql.Open("mysql", dsn)
+	// DSN の組み立て
+	// ※ parseTime=True, loc=Local などオプションは用途に応じて変更
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		user, password, host, port, dbname)
+
+	// GORM の設定: ロガーやスキーマ名、naming strategy など必要に応じて設定
+	// ここでは例として、ログレベルをWarnにし、テーブル名を単数形にする設定をしています
+	gormConfig := &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Warn),
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	}
+
+	// DB接続
+	db, err := gorm.Open(mysql.Open(dsn), gormConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to connect database: %w", err)
 	}
 
-	// Configure the connection pool
-	db.SetConnMaxLifetime(3 * time.Minute)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-
-	// Verify the connection
-	if err := db.Ping(); err != nil {
-		return nil, err
+	// ここで db.DB() を呼び出すと、内部の *sql.DB を取得できます
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get *sql.DB from gorm DB: %w", err)
 	}
 
-	log.Println("MySQL connected successfully")
-	return &MySQLDB{Conn: db}, nil
+	// 接続プールの設定
+	sqlDB.SetConnMaxLifetime(3 * time.Minute)
+	sqlDB.SetMaxOpenConns(10)
+	sqlDB.SetMaxIdleConns(10)
+
+	// Ping で確認（オプション）
+	if err := sqlDB.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	log.Println("MySQL connected successfully (GORM)")
+
+	return &MySQLDB{DB: db}, nil
 }

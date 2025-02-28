@@ -2,20 +2,10 @@
 
 ## pb生成
 ```
-protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative protos\hello.proto
+protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative protos/user.proto
 ```
 
 ## 起動
-### server（ローカル）
-```
-minikube delete
-minikube start --driver=docker
-minikube image load grpc-repos
-kubectl port-forward service/grpc-server-service 8080:80
-cd cmd/server
-go run main.go
-```
-
 ### client
 ```
 go run cmd/client/client.go [name]
@@ -23,19 +13,8 @@ go run cmd/client/client.go [name]
 
 ### Docker起動（ローカル）
 ```
-docker run -d -p 8080:8080 grpc-repos
+docker compose up -d
 docker ps
-```
-
-### k8s起動
-```
-minikube delete
-minikube start --driver=docker
-minikube image load grpc-repos
-kubectl apply -f deployment.yaml
-kubectl get pods
-kubectl port-forward service/grpc-server-service 8080:80     
-Forwarding from 127.0.0.1:8080 -> 8080
 ```
 
 ### request
@@ -44,8 +23,19 @@ grpcurl -plaintext -d '{"name": "kenta"}' localhost:8080 hello.Greeter/SayHello
 ```
 
 
+### Env
+```
+DB_USER=root
+DB_PASSWORD=password
+DB_NAME=user_service
+DB_HOST=localhost
+DB_PORT=3306
+
+```
+
+
 ## 構成
-###フォルダの役割と構成の確認
+### フォルダの役割と構成の確認
 - cmd:
     - cmd/server/main.go: サーバーのエントリーポイント。
     - cmd/client/client.go: クライアントのエントリーポイント。

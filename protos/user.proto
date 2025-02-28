@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "grpc-repos/protos";
+
+service User {
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
+  rpc GetUser (GetUserRequest) returns (GetUserResponse) {}
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+}
+
+message CreateUserResponse {
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserResponse {
+  string name = 1;
+  string email = 2;
+}
