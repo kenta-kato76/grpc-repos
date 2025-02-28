@@ -7,7 +7,7 @@ import (
 
 type UserUsecase interface {
 	CreateUser(name, email string) (*entity.User, error)
-	GetUserByID(id string) (*entity.User, error)
+	GetUserByID(name string) (*entity.User, error)
 	UpdateUser(id, name, email string) (*entity.User, error)
 	DeleteUser(id uint) error
 }
@@ -33,8 +33,8 @@ func (u *userUsecaseImpl) CreateUser(name, email string) (*entity.User, error) {
 	return user, nil
 }
 
-func (u *userUsecaseImpl) GetUserByID(id string) (*entity.User, error) {
-	return u.userRepo.FindByID(id)
+func (u *userUsecaseImpl) GetUserByID(name string) (*entity.User, error) {
+	return u.userRepo.FindByID(name)
 }
 
 func (u *userUsecaseImpl) UpdateUser(id, name, email string) (*entity.User, error) {

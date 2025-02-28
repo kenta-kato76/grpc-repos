@@ -19,9 +19,9 @@ func (r *userRepositoryImpl) Create(user *entity.User) error {
 	return r.db.Create(user).Error
 }
 
-func (r *userRepositoryImpl) FindByID(id string) (*entity.User, error) {
+func (r *userRepositoryImpl) FindByID(name string) (*entity.User, error) {
 	var user entity.User
-	if err := r.db.First(&user, id).Error; err != nil {
+	if err := r.db.Where("name = ?", name).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil

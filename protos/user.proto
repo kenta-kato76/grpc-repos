@@ -18,7 +18,7 @@ message CreateUserResponse {
 }
 
 message GetUserRequest {
-  string id = 1;
+  string name = 1;
 }
 
 message GetUserResponse {

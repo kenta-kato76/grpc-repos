@@ -32,7 +32,7 @@ func (c *UserController) CreateUser(ctx context.Context, in *pb.CreateUserReques
 
 // GET /users/:id
 func (c *UserController) GetUser(ctx context.Context, in *pb.GetUserRequest) (*pb.GetUserResponse, error) {
-	user, err := c.userUsecase.GetUserByID(in.Id)
+	user, err := c.userUsecase.GetUserByID(in.Name)
 	if err != nil {
 		return nil, err
 	}

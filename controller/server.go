@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"context"
+	"grpc-repos/domain/entity"
 	"grpc-repos/infrastructure/database"
 	pb "grpc-repos/protos"
 	"grpc-repos/usecase"
@@ -20,6 +20,11 @@ func ServerStart(lis net.Listener) {
 		log.Fatalf("failed to start db: %v", err)
 	}
 
+	err = d.DB.AutoMigrate(&entity.User{})
+	if err != nil {
+		log.Fatalf("AutoMigrate error: %v", err)
+	}
+
 	userRepository := database.NewUserRepositoryImpl(d.DB)
 	userUsecase := usecase.NewUserUsecase(userRepository)
 	user := NewUserController(userUsecase)
@@ -31,22 +36,4 @@ func ServerStart(lis net.Listener) {
 	if err := u.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-}
-
-// server is used to implement hello.GreeterServer.
-type Server struct {
-	pb.UnimplementedGreeterServer
-	greeterUsecase usecase.GreeterUsecase
-}
-
-func NewServer(greeterUsecase usecase.GreeterUsecase) *Server {
-	return &Server{
-		greeterUsecase: greeterUsecase,
-	}
-}
-
-// SayHello implements hello.GreeterServer
-func (s *Server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloResponse, error) {
-	log.Printf("Received: %v", in.GetName())
-	return s.greeterUsecase.SayHello(ctx, in.GetName())
 }

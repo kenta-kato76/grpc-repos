@@ -4,7 +4,7 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: grpcdb
+      MYSQL_DATABASE: app
     ports:
       - "3306:3306"
     healthcheck:
@@ -33,7 +33,7 @@ services:
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: root
-      DB_NAME: grpcdb
+      DB_NAME: app
     networks:
       - app-network
 
