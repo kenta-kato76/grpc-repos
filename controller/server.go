@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"grpc-repos/domain/entity"
 	"grpc-repos/infrastructure/database"
 	pb "grpc-repos/protos"
 	"grpc-repos/usecase"
@@ -20,8 +19,7 @@ func ServerStart(lis net.Listener) {
 		log.Fatalf("failed to start db: %v", err)
 	}
 
-	err = d.DB.AutoMigrate(&entity.User{})
-	if err != nil {
+	if err := database.MigrateDB(d.DB); err != nil {
 		log.Fatalf("AutoMigrate error: %v", err)
 	}
 

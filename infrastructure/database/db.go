@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"grpc-repos/domain/entity"
 	"log"
 	"os"
 	"time"
@@ -62,4 +63,8 @@ func NewMySQLDB() (*MySQLDB, error) {
 	log.Println("MySQL connected successfully (GORM)")
 
 	return &MySQLDB{DB: db}, nil
+}
+
+func MigrateDB(db *gorm.DB) error {
+	return db.AutoMigrate(&entity.User{}, &entity.Author{}, &entity.Book{})
 }
